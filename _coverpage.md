@@ -5,7 +5,7 @@
 
 [常用资源](https://space.bilibili.com/14163840/channel/index)
 [GitHub](https://github.com/guanhai562/Java-Notes)
-[开始阅读](#docsify-demo)
+[开始阅读](./README.md)
 
 
 
