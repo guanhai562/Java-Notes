@@ -4,7 +4,7 @@
 
 ### 安利一个在线学习Java的文档
 
-- 在线阅读地址：https://guanhai562.gitee.io/Java-Notes/#/
+- 在线阅读地址：https://guanhai562.gitee.io/java-notes/#/
 - Github：https://github.com/guanhai562/Java-Notes
 - 码云：https://gitee.com/guanhai562/Java-Notes
 
