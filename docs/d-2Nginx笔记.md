@@ -350,6 +350,180 @@ cd  /usr/local/nginx/sbin
 
 
 
+### 例2：多端口反向代理
+
+目标：
+
+> 访问 http://120.76.132.224:9001/vod/inde.html 跳转到 http://120.76.132.224:8181/vod/inde.html
+>
+> 访问 http://120.76.132.224:9001/edu/inde.html 跳转到 http://120.76.132.224:8282/edu/inde.html
+
+#### 安装两个tomcat分别定义端口为8181，8282
+
+```bash
+# 打开tomcat存放目录
+cd /usr/src
+# 从源文件夹复制出两份tomcat
+[root@ali2020 src]# cp -r apache-tomcat-7.0.106/ apache-tomcat-8181
+[root@ali2020 src]# cp -r apache-tomcat-7.0.106/ apache-tomcat-8282
+```
+
+![image-20201006145405179](F:\NoteBook\TyporaPic\image-20201006145405179.png)
+
+修改两个Tomcat的server.xml文件修改对应对应端口
+
+```bash
+cd /usr/src/apache-tomcat-8181/conf
+vi server.xml 
+```
+
+![image-20201006150210377](F:\NoteBook\TyporaPic\image-20201006150210377.png)
+
+注意两个tomcat shutdown 进程的端口号不能冲突。
+
+![image-20201006150411487](F:\NoteBook\TyporaPic\image-20201006150411487.png)
+
+#### 创建文件夹和测试界面
+
+![image-20201006150930324](F:\NoteBook\TyporaPic\image-20201006150930324.png)
+
+![image-20201006150958501](F:\NoteBook\TyporaPic\image-20201006150958501.png)
+
+启动tomcat测一下
+
+```bash
+# 启动tomcat
+cd /usr/src/apache-tomcat-8181/bin
+./startup.sh
+```
+
+![image-20201006151502478](F:\NoteBook\TyporaPic\image-20201006151502478.png)
+
+curl http://120.76.132.224:8181/vod/inde.html
+
+
+
+#### 配置nginx配置文件
+
+```bash
+cd /usr/local/nginx/conf/
+vi nginx.conf
+```
+
+![image-20201006151820223](F:\NoteBook\TyporaPic\image-20201006151820223.png)
+
+#### 开放端口
+
+```bash
+firewall-cmd --add-port=8181/tcp --permanent
+
+firewall-cmd --add-port=8282/tcp --permanent
+
+firewall-cmd --add-port=9001/tcp --permanent
+
+firewall-cmd --reload
+```
+
+#### 测试
+
+http://120.76.132.224:9001/vod/inde.html![image-20201006152332121](F:\NoteBook\TyporaPic\image-20201006152332121.png)
+
+http://120.76.132.224:9001/edu/inde.html
+
+## ![image-20201006152357000](F:\NoteBook\TyporaPic\image-20201006152357000.png)
+
+
+
+### 负载均衡实操
+
+准备两台 tomcat 服务器，一台8181，一台8282
+
+在两台 tomcat 里面 webapps 目录中，创建名称是 edu 文件夹，在 edu 文件夹从创建测试页面 inde.html
+
+配置 nginx 配置文件
+
+```bash
+在http模块中配置
+# 负载均衡模块
+upstream myserver{
+
+         server  120.76.132.224:8181 weight=1;
+
+         server  120.76.132.224:8282 weight=2;
+
+    }
+
+在server模块配置
+
+         listen       80;
+
+         server_name  120.76.132.224;
+
+         location / {
+
+            proxy_pass http://myserver;
+
+            root   html;
+
+            index  index.html index.htm;
+
+        }
+
+ 
+```
+
+
+
+Nginx 提供的几种分配策略
+
+```bash
+1、轮询（默认）
+
+每个请求按时间顺序逐一分配到不同的后端服务器，如果后端服务器 down 掉，能自动剔除。
+
+2、weight
+
+weight 代表权,重默认为 1,权重越高被分配的客户端越多
+
+指定轮询几率， weight 和访问比率成正比，用于后端服务器性能不均的情况。 例如：
+
+graphic
+
+3、ip_hash
+
+每个请求按访问 ip 的 hash 结果分配，这样每个访客固定访问一个后端服务器，可以解决 session 的问题。 例如：
+
+upstream server_pool{
+
+  ip_hash;
+
+  server 192.168.5.21:80;
+
+  server 192.16  8.5.22:80;
+
+}
+
+4、 fair（第三方，需要安装第三方模块）
+
+按后端服务器的响应时间来分配请求，响应时间短的优先分配。
+
+upstream server_pool{
+
+  server 192.168.5.21:80;
+
+  server 192.168.5.22:80;
+
+  fair;
+
+}
+```
+
+#### 测试
+
+![image-20201006160232612](F:\NoteBook\TyporaPic\image-20201006160232612.png)![image-20201006160241620](F:\NoteBook\TyporaPic\image-20201006160241620.png)
+
+
+
 ## 参考
 
 https://nishigouzi.github.io/2020/06/07/Nginx%E7%AC%94%E8%AE%B0/#more
