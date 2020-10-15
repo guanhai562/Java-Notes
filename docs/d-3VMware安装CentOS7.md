@@ -16,3 +16,13 @@ https://blog.csdn.net/babyxue/article/details/80970526
 https://m.yisu.com/zixun/63953.html
 
 VMware虚拟机网络配置-NAT篇：https://zhuanlan.zhihu.com/p/130984945
+
+
+
+```bash
+# 修改网关配置
+vi   /etc/sysconfig/network-scripts/ifcfg-ens33
+# 重启网络服务
+service network restart
+```
+

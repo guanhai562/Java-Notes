@@ -13,6 +13,8 @@
   * [计算机网络](./docs/c-1计算机网络.md)
   
     * [正向代理与反向代理](./docs/d-1正向代理与反向代理总结.md)
+    * [Nginx笔记](./docs/d-2Nginx笔记)
+    * [VMware安装CentOS7](./docs/d-3VMware安装CentOS7)
   
 * [数据结构](./docs/c-2数据结构.md)
   
